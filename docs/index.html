@@ -2,6 +2,11 @@
 <head>
   <title>Draft Punk</title>
   <script src="https://api.html5media.info/1.1.8/html5media.min.js"></script>
+  <style>
+    body {
+      max-width: 800px;
+    }
+  </style>
 </head>
 <body>
   <h1>Draft Punk</h1>
@@ -33,7 +38,7 @@
   
   <p>Here's the first few bars of a Daft Punk song with and without phase information: <br/> 
     Get Lucky, <em>normal</em>: <audio src="finals/006_get-lucky-q32.mp3"></audio><br />
-    Get Lucky, <em>phase ignored</em>: <audio src="finals/002_get-lucky-q1.mp3"></audio></p>
+    Get Lucky, <em>phase ignored</em>: <audio src="finals/002_getlucky-q1.mp3"></audio></p>
   
   <h3>Implementation</h3>
   
@@ -48,8 +53,16 @@
 
   <h2>Results</h2>
   
-  <p>Having built and thoroughly experimented with this architecture, we can confidently say that we bit off more than we could chew. 
+  <p>Having built and thoroughly experimented with this architecture, we can confidently say that we bit off more than we could chew. However, we did get a network to sort-of reproduce the sound of a Wurlitzer. Behold, David playing a MIDI instrument creating sound through a neural net: <br /><video src="finals/david-playing-music.mp4"></video></p>
+    
+  <p>In addition to this success, we have a cacophony of failures to share based on our attempts to make this work.</p>
   
-  <!-- <p>Hey, listen to this: <audio src="https://media.githubusercontent.com/media/dgjz-music-composition-services/NeuralNetSynth/master/4Beats2.wav" controls preload></audio></p> -->
+  <h3>Cacophony of failures</h3>
+  
+  <p>Our first attempt at this involved recreating this short sequence of notes:<br><center><audio src="finals/007_4Beats2Mel1Inst2.mp3"></audio></center></p>
+  
+  <p>We never quite figured out how to handle the phase component—though we have some ideas—so really we were training to this, phase-ignored, version of the melody:<br><center><audio src="finals/008_4Beats2Mel1Inst2-q1.mp3"></audio></center></p>
+  
+  <p>In the end, our network produced this sound with the same original MIDI input:<br><center><audio src="finals/009_4Beats2Mel1Inst2-reconstructed-100b.mp3"></audio></center>
 </body>
 </html>
