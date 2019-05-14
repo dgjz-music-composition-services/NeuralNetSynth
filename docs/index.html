@@ -18,7 +18,7 @@
   <h3>Input</h3>
   
   <p>As the input, we used the MIDI standard which normally is used as computer music format in which each individual note that is played is being stored. Midi files then contain instead of the actual audio only the notes that make up a certain song in many ways a very reduced form of the music, a skeleton. Midi is designed to support 127 different notes. The mapping between midi notes and actual frequencies is comparatively simple as each note refers directly to at least one frequency. This relationship is governed by the following formula:<br />
-    <center><img src="midi-note-formula.png" height="50px" /></center></p>
+    <center><img src="images/midi-note-formula.png" height="50px" /></center></p>
   
   <h3>Output</h3>
   
@@ -32,18 +32,18 @@
   <p>However, one thing that the spectrogram doesn't capture is that volume is not enough; <strong>phase also matters</strong>, and it's an integral part of the STFT that is hard to learn. Phase is what aligns the various frequencies together so that they sound coherent and produce the actual desired waveform.</p>
   
   <p>Here's the first few bars of a Daft Punk song with and without phase information: <br/> 
-    Get Lucky, <em>normal</em>: <audio src="finals/006_get_lucky-q32.mp3"></audio><br />
-    Get Lucky, <em>phase ignored</em>: <audio src="finals/002_get_lucky-q1.mp3"></audio></p>
+    Get Lucky, <em>normal</em>: <audio src="finals/006_get-lucky-q32.mp3"></audio><br />
+    Get Lucky, <em>phase ignored</em>: <audio src="finals/002_get-lucky-q1.mp3"></audio></p>
   
   <h3>Implementation</h3>
   
   <p>In this initial approach which can be found in this Notebook we only used linear combinations between the midi input array and the STFT output array.</p>
   
   <p>In this basic example, we used 3 fully connected layers to upscale from the 128 long midi array to the 2050 long array of floats, that contain the real and imaginary parts of the signal decomposition. The two intermediate layers of neurons, scale it first to 1024 values and then to 2048 values. Here's a schematic of this network:<br />
-    <center><img src="network-architecture.png" height="300px" /></center>
+    <center><img src="images/network-architecture.png" height="300px" /></center>
   </p>
 
-  <p>Each neuron determines its activation state by the ReLu function. This function makes sure that only positive values are passed through; see the blue line in the this graph:<br /><center><img src="relu.svg" /></center><br/>
+  <p>Each neuron determines its activation state by the ReLu function. This function makes sure that only positive values are passed through; see the blue line in the this graph:<br /><center><img src="images/relu.svg" /></center><br/>
     What you see above is the output (Y-axis) as a function of the input (X-Axis).</p>
 
   <h2>Results</h2>
