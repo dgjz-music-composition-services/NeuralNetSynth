@@ -1,24 +1,36 @@
 <html>
 <head>
+  <meta charset="UTF-8">
   <title>Draft Punk</title>
   <script src="https://api.html5media.info/1.1.8/html5media.min.js"></script>
   <style>
     body {
+      margin-left: auto;
+      margin-right: auto;
       max-width: 800px;
+      padding: 50px; 
+    }
+    
+    .byline {
+      font-style: italic;
+    }
+    
+    .small {
+      width: 50%;
     }
   </style>
 </head>
 <body>
   <h1>Draft Punk</h1>
-  <p>A IS 6940 project by David Goedicke &amp; J.D. Zamfirescu-Pereira</p>
+  <p class="byline">A IS 6940 project by David Goedicke &amp; J.D. Zamfirescu-Pereira</p>
   <p>Inspired by recent work in algorithmic visual style transfer, we set out to build a system that uses reinforcement learning techniques to provide artists with a novel interface for creating music in the style of previous work, reproducing a previous artist’s “signature” or “essential” sound. Our intent was to build a system based on promising deep learning approaches to pattern matching for deeply complex but hierarchical data, using such to identify, for a given artist, the major audio frequency components associated with a particular note (and in relation to previous notes), creating an “audiography” for that artist. Users would then be able to select an artist and create new music in the style of that artist.</p>
   <p>While we believe that such a project is possible, and our approach is plausible, the complexity of what we set out to do vastly exceeded the time and computational power we had at our disposal. Nevertheless, our experimentation in this direction yielded a few interesting insights and sounds, which we have loosely organized here.</p>
   
   <h2>Approach</h2>
   
-  <p>Our overall approach was to train a neural net in a "reinforcement learning" style. Briefly, "reinforcement learning" means that you provide the network with an input and an output simultaneously, and train it to produce the output from the given input in the future. A common example of this is image classifier networks: the input is an image of a cat, the output is the label "cat", and the network is trained to recognize the image, so that in the future you can provide an image of a cat, and the network outputs the label "cat" on its own. By showing enough examples of cats and other objects with the correct labels, the network eventually learns to produce the "cat" label on novel input images.</p>
+  <p>Our overall approach was to train a neural net in a “reinforcement learning” style. Briefly, “reinforcement learning” means that you provide the network with an input and an output simultaneously, and train it to produce the output from the given input in the future. A common example of this is image classifier networks: the input is an image of a cat, the output is the label “cat”, and the network is trained to recognize the image, so that in the future you can provide an image of a cat, and the network outputs the label “cat” on its own. By showing enough examples of cats and other objects with the correct labels, the network eventually learns to produce the “cat” label on novel input images.</p>
   
-  <p>We are taking the same approach, except that our input is notes played on a keyboard (MIDI) and our output is samples of audio from an MP3. Our intent is for the network to learn what ABBA or Daft Punk "sounds like" for a given note, melody, or chord.</p>
+  <p>We are taking the same approach, except that our input is notes played on a keyboard (MIDI) and our output is samples of audio from an MP3. Our intent is for the network to learn what ABBA or Daft Punk “sounds like” for a given note, melody, or chord.</p>
   
   <h3>Input</h3>
   
@@ -29,14 +41,14 @@
   
   <p>Signal decomposition into frequencies using a technique called <a href="https://en.wikipedia.org/wiki/Short-time_Fourier_transform" title="Short-time Fourier transform - Wikipedia">Short-term Fourier Transform</a> (STFT). The STFT technique samples the entire song into really short time chunks (20 milliseconds, 1/50 of a second) and then measures the volume (“energy”) in each sample for each of 1000 frequencies (“tones”). This yields a “table” where the rows are frequencies of sound, and the columns are each 20-millisecond sample. By using an “inverse transform” we can programmatically reconstruct a perceptually equivalent sound from this table.</p>
   
-  <p>These "tables" are often displayed as spectrograms, like this example:<br />
+  <p>These “tables” are often displayed as spectrograms, like this example:<br />
     <center><img src="spectra/4layers256Big10Sequence64Batch2048Fft1024hop.png" height="300px" /></center><br />
     What you see above is the relative intensity of the sound in each frequency (Y-axis) over time (X-axis).
   </p>
   
-  <p>However, one thing that the spectrogram doesn't capture is that volume is not enough; <strong>phase also matters</strong>, and it's an integral part of the STFT that is hard to learn. Phase is what aligns the various frequencies together so that they sound coherent and produce the actual desired waveform.</p>
+  <p>However, one thing that the spectrogram doesn’t capture is that volume is not enough; <strong>phase also matters</strong>, and it’s an integral part of the STFT that is hard to learn. Phase is what aligns the various frequencies together so that they sound coherent and produce the actual desired waveform.</p>
   
-  <p>Here's the first few bars of a Daft Punk song with and without phase information: <br/> 
+  <p>Here’s the first few bars of a Daft Punk song with and without phase information: <br/> 
     Get Lucky, <em>normal</em>: <audio src="finals/006_get-lucky-q32.mp3"></audio><br />
     Get Lucky, <em>phase ignored</em>: <audio src="finals/002_getlucky-q1.mp3"></audio></p>
   
@@ -44,7 +56,7 @@
   
   <p>In this initial approach which can be found in this Notebook we only used linear combinations between the midi input array and the STFT output array.</p>
   
-  <p>In this basic example, we used 3 fully connected layers to upscale from the 128 long midi array to the 2050 long array of floats, that contain the real and imaginary parts of the signal decomposition. The two intermediate layers of neurons, scale it first to 1024 values and then to 2048 values. Here's a schematic of this network:<br />
+  <p>In this basic example, we used 3 fully connected layers to upscale from the 128 long midi array to the 2050 long array of floats, that contain the real and imaginary parts of the signal decomposition. The two intermediate layers of neurons, scale it first to 1024 values and then to 2048 values. Here’s a schematic of this network:<br />
     <center><img src="images/network-architecture.png" height="300px" /></center>
   </p>
 
@@ -63,6 +75,45 @@
   
   <p>We never quite figured out how to handle the phase component—though we have some ideas—so really we were training to this, phase-ignored, version of the melody:<br><center><audio src="finals/008_4Beats2Mel1Inst2-q1.mp3"></audio></center></p>
   
-  <p>In the end, our network produced this sound with the same original MIDI input:<br><center><audio src="finals/009_4Beats2Mel1Inst2-reconstructed-100b.mp3"></audio></center>
+  <p>In the end, our network produced this sound with the same original MIDI input:<br><center><audio src="finals/009_4Beats2Mel1Inst2-reconstructed-100b.mp3"></audio></center></p>
+  
+  <p>But what did the network truly learn? If we now use a different set of input notes—say, the same note played three times?<br><center><audio src="finals/010_4Beats2.mp3"></audio></center><br/>Do we hear a Wurlitzer-ed version of the three notes? Kind of! But also echoes of something else:<br/><center><audio src="finals/011_4Beats2-reconstructed-100b.mp3"></audio></center></p>
+  
+  <p>The network also learned that the first note is followed by two more!</p>
+  
+  <p>You can experiment with these sounds and others using our Jupyter notebooks—the sounds above came from <a href="https://github.com/dgjz-music-composition-services/NeuralNetSynth/blob/master/HISTORY_WINDOW.ipynb">this notebook</a>. You’ll need to clone our repository and install Jupyter and the dependencies listed. We highly recommend using anaconda or miniconda for this; a tutorial is unfortunately out of the scope of this project.</p>
+
+  <h2>Inspiration</h2>
+  
+  <h3>AI + Music</h3>
+  <p>The AI piece of this project was inspired by two main sources: Style Transfer, the technique that applies the style of one image to the content of another. Here’s Van Gogh’s <em>Starry Night</em>’s style applied to a photo of some dude sleeping on a couch:<br>
+    <center><img src="images/style-transfer.png" width="600px;"></center><br>
+    We aimed to achieve a similar goal in the domain of music.
+  </p>
+  
+  <p>We also enjoyed exploring the set of tools already out there, many of them enabled by Google’s <a href="https://magenta.tensorflow.org" title="Magenta">Magenta</a>:
+    <ul>
+      <li><a href="https://codepen.io/teropa/pen/gvwwZL">Neural Melody Autocompletion</a></li>
+      <li><a href="https://experiments.withgoogle.com/ai/melody-mixer/view/" title="Melody Mixer">Melody Mixer</a></li>
+      <li><a href="https://codepen.io/teropa/full/JLjXGK/">Neural Drum Machine</a></li>
+      <li><a href="https://codepen.io/teropa/full/rdoPbG/">Latent Cycles</a></li>
+      <li><a href="https://www.youtube.com/watch?v=3ZOzUVD4oLg" title="Max Mathews Radio Baton Demonstration - YouTube">“Radio Baton” with Max Mathews</a></li>
+      <li><a href="https://teropa.info/musicmouse/" title="Music Mouse - An Intelligent Instrument - An Emulation">Music Mouse</a></li>
+      <li><a href="https://teampieshop.github.io/latent-loops/" title="Latent Loops">Latent Loops</a></li>
+      <li><a href="http://piano-genie.glitch.me/" title="Piano Genie">Piano Genie</a></li>
+      <li><a href="https://coconet.glitch.me/#67:8:0,67:9:0,67:10:0,65:24:0,65:25:0,65:26:0,65:27:0,64:0:0,64:1:0,64:2:0,64:3:0,64:4:0,64:5:0,64:6:0,64:7:0,64:11:0,64:12:0,64:13:0,63:16:0,63:17:0,63:18:0,63:19:0,63:28:0,63:29:0,63:30:0,63:31:0,62:14:0,62:15:0,61:26:1,61:27:1,60:0:1,60:1:1,60:2:1,60:3:1,60:4:1,60:5:1,60:6:1,60:7:1,60:8:1,60:9:1,60:10:1,60:11:1,60:12:1,60:13:1,60:14:1,60:15:1,60:16:1,60:17:1,60:18:1,60:19:1,60:20:0,60:21:1,60:22:0,60:23:0,60:28:1,60:29:1,58:22:1,58:23:1,58:24:2,58:25:2,58:30:1,58:31:1,56:20:1,56:24:1,56:25:1,56:26:2,56:27:2,55:0:2,55:1:2,55:2:2,55:3:2,55:4:2,55:5:2,55:6:2,55:7:2,55:8:2,55:9:2,55:12:2,55:13:2,55:14:2,55:15:2,55:16:2,55:17:2,55:19:2,55:28:2,55:29:2,55:30:2,55:31:2,53:10:2,53:11:2,53:18:2,51:8:3,51:9:3,51:10:3,51:20:2,51:21:2,51:22:2,51:23:2,51:28:3,51:29:3,51:30:3,51:31:3,49:24:3,49:25:3,49:26:3,49:27:3,48:0:3,48:1:3,48:2:3,48:3:3,48:4:3,48:5:3,48:6:3,48:7:3,48:11:3,48:12:3,48:13:3,46:14:3,46:15:3,44:16:3,44:17:3,44:18:3,44:19:3,44:20:3,44:21:3,44:22:3,44:23:3" title="coucou 🐦">Coucou</a></li>
+    </ul>
+  
+  <h3>Musical Instruments</h3>
+  <p>We also loved reading Bart Hopkin’s <em>Musical Instrument Design</em>. It is full of wonderful diagrams and phenomenological explanations, including:
+    <center><img src="finals/fft.png" class="small" alt="Fft"><br>An FFT</center><br />
+    <center><img src="finals/fork-chime.png" class="small" alt="Fork Chime"><br>A fork chime</center><br />
+    <center><img src="finals/kalimba.png" class="small" alt="Kalimba"><br>A Kalimba</center><br />
+    <center><img src="finals/string-nodes.png" class="small" alt="String Nodes"><br> Nodes in a vibrating string</center>
+  </p>
+  
+  <h2>Future Work</h2>
+  
+  
 </body>
 </html>
