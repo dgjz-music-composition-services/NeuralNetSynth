@@ -1,13 +1,54 @@
 <html>
 <head>
+  <title>Draft Punk</title>
   <script src="https://api.html5media.info/1.1.8/html5media.min.js"></script>
 </head>
 <body>
   <h1>Draft Punk</h1>
-  <p>David Goedicke &amp; J.D. Zamfirescu-Pereira</p>
+  <p>A IS 6940 project by David Goedicke &amp; J.D. Zamfirescu-Pereira</p>
   <p>Inspired by recent work in algorithmic visual style transfer, we set out to build a system that uses reinforcement learning techniques to provide artists with a novel interface for creating music in the style of previous work, reproducing a previous artist’s “signature” or “essential” sound. Our intent was to build a system based on promising deep learning approaches to pattern matching for deeply complex but hierarchical data, using such to identify, for a given artist, the major audio frequency components associated with a particular note (and in relation to previous notes), creating an “audiography” for that artist. Users would then be able to select an artist and create new music in the style of that artist.</p>
   <p>While we believe that such a project is possible, and our approach is plausible, the complexity of what we set out to do vastly exceeded the time and computational power we had at our disposal. Nevertheless, our experimentation in this direction yielded a few interesting insights and sounds, which we have loosely organized here.</p>
+  
+  <h2>Approach</h2>
+  
+  <p>Our overall approach was to train a neural net in a "reinforcement learning" style. Briefly, "reinforcement learning" means that you provide the network with an input and an output simultaneously, and train it to produce the output from the given input in the future. A common example of this is image classifier networks: the input is an image of a cat, the output is the label "cat", and the network is trained to recognize the image, so that in the future you can provide an image of a cat, and the network outputs the label "cat" on its own. By showing enough examples of cats and other objects with the correct labels, the network eventually learns to produce the "cat" label on novel input images.</p>
+  
+  <p>We are taking the same approach, except that our input is notes played on a keyboard (MIDI) and our output is samples of audio from an MP3. Our intent is for the network to learn what ABBA or Daft Punk "sounds like" for a given note, melody, or chord.</p>
+  
+  <h3>Input</h3>
+  
+  <p>As the input, we used the MIDI standard which normally is used as computer music format in which each individual note that is played is being stored. Midi files then contain instead of the actual audio only the notes that make up a certain song in many ways a very reduced form of the music, a skeleton. Midi is designed to support 127 different notes. The mapping between midi notes and actual frequencies is comparatively simple as each note refers directly to at least one frequency. This relationship is governed by the following formula:<br />
+    <center><img src="midi-note-formula.png" height="50px" /></center></p>
+  
+  <h3>Output</h3>
+  
+  <p>Signal decomposition into frequencies using a technique called <a href="https://en.wikipedia.org/wiki/Short-time_Fourier_transform" title="Short-time Fourier transform - Wikipedia">Short-term Fourier Transform</a> (STFT). The STFT technique samples the entire song into really short time chunks (20 milliseconds, 1/50 of a second) and then measures the volume (“energy”) in each sample for each of 1000 frequencies (“tones”). This yields a “table” where the rows are frequencies of sound, and the columns are each 20-millisecond sample. By using an “inverse transform” we can programmatically reconstruct a perceptually equivalent sound from this table.</p>
+  
+  <p>These "tables" are often displayed as spectrograms, like this example:<br />
+    <center><img src="spectra/4layers256Big10Sequence64Batch2048Fft1024hop.png" height="300px" /></center><br />
+    What you see above is the relative intensity of the sound in each frequency (Y-axis) over time (X-axis).
+  </p>
+  
+  <p>However, one thing that the spectrogram doesn't capture is that volume is not enough; <strong>phase also matters</strong>, and it's an integral part of the STFT that is hard to learn. Phase is what aligns the various frequencies together so that they sound coherent and produce the actual desired waveform.</p>
+  
+  <p>Here's the first few bars of a Daft Punk song with and without phase information: <br/> 
+    Get Lucky, <em>normal</em>: <audio src="finals/006_get_lucky-q32.mp3"></audio><br />
+    Get Lucky, <em>phase ignored</em>: <audio src="finals/002_get_lucky-q1.mp3"></audio></p>
+  
+  <h3>Implementation</h3>
+  
+  <p>In this initial approach which can be found in this Notebook we only used linear combinations between the midi input array and the STFT output array.</p>
+  
+  <p>In this basic example, we used 3 fully connected layers to upscale from the 128 long midi array to the 2050 long array of floats, that contain the real and imaginary parts of the signal decomposition. The two intermediate layers of neurons, scale it first to 1024 values and then to 2048 values. Here's a schematic of this network:<br />
+    <center><img src="network-architecture.png" height="300px" /></center>
+  </p>
 
+  <p>Each neuron determines its activation state by the ReLu function. This function makes sure that only positive values are passed through; see the blue line in the this graph:<br /><center><img src="relu.svg" /></center><br/>
+    What you see above is the output (Y-axis) as a function of the input (X-Axis).</p>
+
+  <h2>Results</h2>
+  
+  <p>Having built and thoroughly experimented with this architecture, we can confidently say that we bit off more than we could chew. 
   
   <!-- <p>Hey, listen to this: <audio src="https://media.githubusercontent.com/media/dgjz-music-composition-services/NeuralNetSynth/master/4Beats2.wav" controls preload></audio></p> -->
 </body>
