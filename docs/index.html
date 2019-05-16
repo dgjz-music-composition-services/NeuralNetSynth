@@ -49,8 +49,8 @@
   <p>However, one thing that the spectrogram doesn’t capture is that volume is not enough; <strong>phase also matters</strong>, and it’s an integral part of the STFT that is hard to learn. Phase is what aligns the various frequencies together so that they sound coherent and produce the actual desired waveform.</p>
   
   <p>Here’s the first few bars of a Daft Punk song with and without phase information: <br/> 
-    Get Lucky, <em>normal</em>: <audio src="finals/006_get-lucky-q32.mp3"></audio><br />
-    Get Lucky, <em>phase ignored</em>: <audio src="finals/002_get-lucky-q1.mp3"></audio></p>
+    Get Lucky, <em>normal</em>: <audio controls src="finals/006_get-lucky-q32.mp3"></audio><br />
+    Get Lucky, <em>phase ignored</em>: <audio controls src="finals/002_get-lucky-q1.mp3"></audio></p>
   
   <h3>Implementation</h3>
   
@@ -71,13 +71,13 @@
   
   <h3>Cacophony of failures</h3>
   
-  <p>Our first attempt at this involved recreating this short sequence of notes:<br><center><audio src="finals/007_4Beats2Mel1Inst2.mp3"></audio></center></p>
+  <p>Our first attempt at this involved recreating this short sequence of notes:<br><center><audio controls src="finals/007_4Beats2Mel1Inst2.mp3"></audio></center></p>
   
-  <p>We never quite figured out how to handle the phase component—though we have some ideas—so really we were training to this, phase-ignored, version of the melody:<br><center><audio src="finals/008_4Beats2Mel1Inst2-q1.mp3"></audio></center></p>
+  <p>We never quite figured out how to handle the phase component—though we have some ideas—so really we were training to this, phase-ignored, version of the melody:<br><center><audio controls src="finals/008_4Beats2Mel1Inst2-q1.mp3"></audio></center></p>
   
-  <p>In the end, our network produced this sound with the same original MIDI input:<br><center><audio src="finals/009_4Beats2Mel1Inst2-reconstructed-100b.mp3"></audio></center></p>
+  <p>In the end, our network produced this sound with the same original MIDI input:<br><center><audio controls src="finals/009_4Beats2Mel1Inst2-reconstructed-100b.mp3"></audio></center></p>
   
-  <p>But what did the network truly learn? If we now use a different set of input notes—say, the same note played three times?<br><center><audio src="finals/010_4Beats2.mp3"></audio></center><br/>Do we hear a Wurlitzer-ed version of the three notes? Kind of! But also echoes of something else:<br/><center><audio src="finals/011_4Beats2-reconstructed-100b.mp3"></audio></center></p>
+  <p>But what did the network truly learn? If we now use a different set of input notes—say, the same note played three times?<br><center><audio controls src="finals/010_4Beats2.mp3"></audio></center><br/>Do we hear a Wurlitzer-ed version of the three notes? Kind of! But also echoes of something else:<br/><center><audio controls src="finals/011_4Beats2-reconstructed-100b.mp3"></audio></center></p>
   
   <p>The network also learned that the first note is followed by two more!</p>
   
